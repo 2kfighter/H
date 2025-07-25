@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marketplace</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 1em;
+      text-align: center;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2em;
+    }
+
+    .products {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .product {
+      margin: 1em;
+      padding: 1em;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .product img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 10px 10px 0 0;
+    }
+
+    .contact-button {
+      background-color: #25D366;
+      color: #fff;
+      border: none;
+      padding: 1em 2em;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    .contact-button:hover {
+      background-color: #1DA335;
+    }
+
+    .search-bar {
+      padding: 1em;
+      width: 50%;
+      font-size: 1.5em;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Marketplace</h1>
+  </header>
+  <main>
+    <input type="text" id="search-bar" class="search-bar" placeholder="Rechercher un produit...">
+    <button id="search-button">Rechercher</button>
+    <section class="products" id="products">
+      <div class="product" data-name="Produit 1" data-price="10€">
+        <img src="produit1.jpg" alt="Produit 1">
+        <h3>Produit 1</h3>
+        <p>Prix : 10€</p>
+        <button class="contact-button" data-phone="+33612345678" data-message="Bonjour, je suis intéressé par le Produit 1">Contacter le vendeur</button>
+      </div>
+      <div class="product" data-name="Produit 2" data-price="20€">
+        <img src="produit2.jpg" alt="Produit 2">
+        <h3>Produit 2</h3>
+        <p>Prix : 20€</p>
+        <button class="contact-button" data-phone="+33612345678" data-message="Bonjour, je suis intéressé par le Produit 2">Contacter le vendeur</button>
+      </div>
+      <div class="product" data-name="Produit 3" data-price="30€">
+        <img src="produit3.jpg" alt="Produit 3">
+        <h3>Produit 3</h3>
+        <p>Prix : 30€</p>
+        <button class="contact-button" data-phone="+33612345678" data-message="Bonjour, je suis intéressé par le Produit 3">Contacter le vendeur</button>
+      </div>
+    </section>
+  </main>
+  <script>
+    const searchBar = document.getElementById('search-bar');
+    const searchButton = document.getElementById('search-button');
+    const products = document.querySelectorAll('.product');
+    const contactButtons = document.querySelectorAll('.contact-button');
+
+    searchButton.addEventListener('click', () => {
+      const searchValue = searchBar.value.toLowerCase();
+      products.forEach(product => {
+        const productName = product.getAttribute('data-name').toLowerCase();
+        if (productName.includes(searchValue)) {
+          product.style.display = 'block';
+        } else {
+          product.style.display = 'none';
+        }
+      });
+    });
+
+    contactButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const phoneNumber = button.getAttribute('data-phone');
+        const message = button.getAttribute('data-message');
+        const whatsappLink = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappLink, '_blank');
+      });
+    });
+  </script>
+</body>
+</html>
