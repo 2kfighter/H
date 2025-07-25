@@ -1,59 +1,247 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Boutique Andi</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 600px;      margin: auto;
-    }
-    .product {
-      background-color: #fff;
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .btn {
-      background-color: #25D366; /* Couleur WhatsApp */
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 5px;
-      text-decoration: none;
-      display: inline-block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WhatsApp Shop</title>
+  <style>
+    :root {
+      --bg: #fff;
+      --fg: #333;
+      --primary: #25D366;
+      --secondary: #128C7E;
+    }
+    [data-theme="dark"] {
+      --bg: #1e1e1e;
+      --fg: #ddd;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 { font-size: 1.8rem; }
+    nav { display: flex; gap: .5rem; }
+    nav input, nav select {
+      padding: .5rem; border: none; border-radius: 4px;
+    }
+    #modeToggle {
+      background: none; border: none; font-size: 1.2rem; cursor: pointer;
+    }
+    main {
+      flex: 1; display: flex; gap: 1rem; padding: 1rem;
+    }
+    .product-grid {
+      flex: 3;
+      display: grid;
+      grid-template-columns: repeat(auto-fill,minmax(200px,1fr));
+      gap: 1rem;
+    }
+    .product-card {
+      background: var(--bg);
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      transition: transform .2s;
+      overflow: hidden;
+    }
+    .product-card:hover { transform: translateY(-5px); }
+    .product-card img { width: 100%; display: block; }
+    .product-card .info {
+      padding: .5rem;
+    }
+    .product-card button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      width: 100%;
+      padding: .6rem;
+      cursor: pointer;
+      border-radius: 0 0 6px 6px;
+    }
+    #cart {
+      flex: 1; max-width: 300px;
+      background: var(--bg);
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 1rem;
+      position: sticky; top: 1rem;
+      height: fit-content;
+    }
+    #cartItems { list-style: none; margin: 1rem 0; }
+    #cartItems li {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: .5rem;
+    }
+    #whatsappCheckout {
+      background: var(--secondary);
+      color: #fff;
+      border: none;
+      width: 100%;
+      padding: .7rem;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    #newsletter {
+      margin-top: 2rem; width: 100%;
+    }
+    #newsletter form {
+      display: flex; gap: .5rem;
+    }
+    #newsletterMsg {
+      margin-top: .5rem; font-style: italic;
+    }
+    #backToTop {
+      position: fixed; bottom: 20px; right: 20px;
+      background: var(--primary); color: #fff;
+      border: none; padding: .6rem .8rem;
+      border-radius: 50%; cursor: pointer;
+      display: none;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Boutique Andi</h1>
-    <p>Choisis ton style, passe ta commande par WhatsApp !</p>
+  <header>
+    <h1>WhatsApp Shop</h1>
+    <nav>
+      <input type="text" id="searchInput" placeholder="Rechercher un produit..." />
+      <select id="categoryFilter">
+        <option value="all">Toutes catégories</option>
+        <option value="accessoires">Accessoires</option>
+        <option value="e-books">E-Books</option>
+        <option value="plugins">Plugins</option>
+      </select>
+      <button id="modeToggle">🌙</button>
+    </nav>
+  </header>
 
-    <div class="product">
-      <h2>Sneakers Andi</h2>
-      <p>Prix : 30 €</p>
-      <a class="btn" href="https://wa.me/226XXXXXXXXX?text=Bonjour%20je%20veux%20commander%20les%20Sneakers%20Andi%20à%2030€" target="_blank">
-        Commander via WhatsApp
-      </a>
-    </div>
+  <main>
+    <section id="products" class="product-grid"></section>
 
-    <div class="product">
-      <h2>T-shirt Édition Limitée</h2>
-      <p>Prix : 20 €</p>
-      <a class="btn" href="https://wa.me/226XXXXXXXXX?text=Bonjour%20je%20souhaite%20acheter%20le%20T-shirt%20à%2020€" target="_blank">
-        Commander via WhatsApp
-      </a>
-    </div>
-  </div>
+    <aside id="cart">
+      <h2>Panier</h2>
+      <ul id="cartItems"></ul>
+      <div id="total">Total: 0 €</div>
+      <button id="whatsappCheckout">Commander via WhatsApp</button>
+    </aside>
+
+    <section id="newsletter">
+      <h2>Inscrivez-vous à la newsletter</h2>
+      <form id="newsletterForm">
+        <input type="email" id="email" placeholder="Votre email" required />
+        <button type="submit">S'inscrire</button>
+      </form>
+      <p id="newsletterMsg"></p>
+    </section>
+  </main>
+
+  <button id="backToTop">↑</button>
+
+  <script>
+    const products = [
+      { id:1, name:"Guide WhatsApp API", category:"e-books", price:19.9, img:"images/ebook1.jpg" },
+      { id:2, name:"Pack Stickers",     category:"accessoires", price: 4.5, img:"images/stickers.jpg" },
+      { id:3, name:"Plugin Bot",        category:"plugins",     price:49.9, img:"images/plugin.jpg" }
+    ];
+    let cart = [];
+
+    function renderProducts(list) {
+      const container = document.getElementById('products');
+      container.innerHTML = '';
+      list.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <img src="${p.img}" alt="${p.name}" />
+          <div class="info">
+            <h3>${p.name}</h3>
+            <p>${p.price.toFixed(2)} €</p>
+          </div>
+          <button onclick="addToCart(${p.id})">Ajouter au panier</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function addToCart(id) {
+      const prod = products.find(p => p.id === id);
+      cart.push(prod);
+      updateCartUI();
+    }
+
+    function removeFromCart(i) {
+      cart.splice(i, 1);
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      const listEl = document.getElementById('cartItems');
+      const totalEl = document.getElementById('total');
+      listEl.innerHTML = '';
+      let total = 0;
+      cart.forEach((item, i) => {
+        total += item.price;
+        const li = document.createElement('li');
+        li.innerHTML = \`\${item.name} - \${item.price.toFixed(2)} € <button onclick="removeFromCart(\${i})">x</button>\`;
+        listEl.appendChild(li);
+      });
+      totalEl.textContent = \`Total: \${total.toFixed(2)} €\`;
+    }
+
+    document.getElementById('searchInput').addEventListener('input', filterProducts);
+    document.getElementById('categoryFilter').addEventListener('change', filterProducts);
+
+    function filterProducts() {
+      const term = document.getElementById('searchInput').value.toLowerCase();
+      const cat  = document.getElementById('categoryFilter').value;
+      const filtered = products.filter(p => {
+        const matchesTerm = p.name.toLowerCase().includes(term);
+        const matchesCat  = cat === 'all' || p.category === cat;
+        return matchesTerm && matchesCat;
+      });
+      renderProducts(filtered);
+    }
+
+    document.getElementById('whatsappCheckout').addEventListener('click', () => {
+      if (!cart.length) { alert("Votre panier est vide !"); return; }
+      let msg = "Bonjour, je voudrais commander :%0A";
+      cart.forEach(i => msg += \`- \${i.name} (\${i.price.toFixed(2)} €)%0A\`);
+      msg += \`Total: \${cart.reduce((s,i)=>s+i.price,0).toFixed(2)} €\`;
+      window.open(\`https://api.whatsapp.com/send?phone=+226XXXXXXXX&text=\${msg}\`, '_blank');
+    });
+
+    document.getElementById('modeToggle').addEventListener('click', () => {
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    });
+
+    document.getElementById('newsletterForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      document.getElementById('newsletterMsg').textContent = \`Merci, \${email} a bien été ajouté !\`;
+      e.target.reset();
+    });
+
+    const back = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      back.style.display = window.scrollY > 300 ? 'block' : 'none';
+    });
+    back.addEventListener('click', () => window.scrollTo({ top:0, behavior:'smooth' }));
+
+    renderProducts(products);
+    updateCartUI();
+  </script>
 </body>
 </html>
